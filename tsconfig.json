@@ -3,7 +3,7 @@
     "target": "es6",
     "module": "es6",
     "sourceMap": true,
-    "allowJs": true,
+    "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
@@ -21,7 +21,6 @@
     "**/*.spec.js",
     "**/*.spec.ts",
     "*.conf*.js",
-    "index.js",
     "lib-jitsi-meet.*.js",
     "webpack*.js",
   ]
