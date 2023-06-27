@@ -71,7 +71,6 @@ function _initCallStatsBackend(options) {
         userName: options.userName,
         aliasName: options.aliasName,
         applicationName: options.applicationName,
-        getWiFiStatsMethod: options.getWiFiStatsMethod,
         confID: options.confID,
         siteID: options.siteID,
         configParams: options.configParams
@@ -164,7 +163,7 @@ export default function Statistics(xmpp, options) {
     this.options = options || {};
 
     this.callStatsIntegrationEnabled
-        = this.options.callStatsID && this.options.callStatsSecret && this.options.enableCallStats
+        = this.options.callStatsID && this.options.callStatsSecret
 
             // Even though AppID and AppSecret may be specified, the integration
             // of callstats.io may be disabled because of globally-disallowed
@@ -775,8 +774,6 @@ Statistics.prototype.sendAddIceCandidateFailed = function(e, tpc) {
  */
 Statistics.sendLog = function(m) {
     const globalSubSet = new Set();
-
-    logger.log(m);
 
     // FIXME we don't want to duplicate logs over P2P instance, but
     // here we should go over instances and call this method for each

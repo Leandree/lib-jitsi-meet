@@ -77,7 +77,6 @@ interface ICreateLocalTrackOptions {
 
 interface IJitsiMeetJSOptions {
     enableAnalyticsLogging?: boolean;
-    enableUnifiedOnChrome?: boolean;
     enableWindowOnErrorHandler?: boolean;
     externalStorage?: Storage;
     flags?: {
@@ -131,6 +130,9 @@ export default {
     mediaDevices: JitsiMediaDevices as unknown,
     analytics: Statistics.analytics as unknown,
     init(options: IJitsiMeetJSOptions = {}) {
+        // @ts-ignore
+        logger.info(`This appears to be ${browser.getName()}, ver: ${browser.getVersion()}`);
+
         Settings.init(options.externalStorage);
         Statistics.init(options);
         const flags = options.flags || {};
@@ -308,7 +310,7 @@ export default {
                         'success',
                         getAnalyticsAttributesFromOptions(restOptions)));
 
-                if (!RTC.options.disableAudioLevels) {
+                if (this.isCollectingLocalStats()) {
                     for (let i = 0; i < tracks.length; i++) {
                         const track = tracks[i];
 
@@ -485,8 +487,7 @@ export default {
      * @param {boolean} True if stats are being collected for local tracks.
      */
     isCollectingLocalStats() {
-        return Statistics.audioLevelsEnabled
-            && LocalStatsCollector.isLocalStatsSupported();
+        return Statistics.audioLevelsEnabled && LocalStatsCollector.isLocalStatsSupported();
     },
 
     /**

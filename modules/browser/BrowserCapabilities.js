@@ -1,7 +1,4 @@
 import { BrowserDetection } from '@jitsi/js-utils';
-import { getLogger } from '@jitsi/logger';
-
-const logger = getLogger(__filename);
 
 /* Minimum required Chrome / Chromium version. This applies also to derivatives. */
 const MIN_REQUIRED_CHROME_VERSION = 72;
@@ -18,15 +15,6 @@ const MIN_REQUIRED_IOS_VERSION = 14;
  * Implements browser capabilities for lib-jitsi-meet.
  */
 export default class BrowserCapabilities extends BrowserDetection {
-    /**
-     * Creates new BrowserCapabilities instance.
-     */
-    constructor() {
-        super();
-        logger.info(
-            `This appears to be ${this.getName()}, ver: ${this.getVersion()}`);
-    }
-
     /**
      * Tells whether or not the <tt>MediaStream/tt> is removed from the <tt>PeerConnection</tt> and disposed on video
      * mute (in order to turn off the camera device). This is needed on Firefox because of the following bug
@@ -200,11 +188,7 @@ export default class BrowserCapabilities extends BrowserDetection {
      */
     supportsReceiverStats() {
         return typeof window.RTCRtpReceiver !== 'undefined'
-            && Object.keys(RTCRtpReceiver.prototype).indexOf('getSynchronizationSources') > -1
-
-            // Disable this on Safari because it is reporting 0.000001 as the audio levels for all
-            // remote audio tracks.
-            && !this.isWebKitBased();
+            && Object.keys(RTCRtpReceiver.prototype).indexOf('getSynchronizationSources') > -1;
     }
 
     /**
@@ -222,6 +206,15 @@ export default class BrowserCapabilities extends BrowserDetection {
         // https://bugzilla.mozilla.org/show_bug.cgi?id=1241066
         // For Chrome and others we rely on 'googRtt'.
         return !this.isFirefox();
+    }
+
+    /**
+     * Returns true if the browser supports track based statistics for the local video track. Otherwise,
+     * track resolution and framerate will be calculated based on the 'outbound-rtp' statistics.
+     * @returns {boolean}
+     */
+    supportsTrackBasedStats() {
+        return this.isChromiumBased() && this.isVersionLessThan(112);
     }
 
     /**
@@ -317,7 +310,7 @@ export default class BrowserCapabilities extends BrowserDetection {
     supportsUnifiedPlan() {
         // We do not want to enable unified plan on Electron clients that have Chromium version < 96 because of
         // performance and screensharing issues.
-        return !(this.isReactNative() || (this.isElectron() && (this._getChromiumBasedVersion() < 96)));
+        return !(this.isElectron() && (this._getChromiumBasedVersion() < 96));
     }
 
     /**
